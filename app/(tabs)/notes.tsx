@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useNotes } from './context/notes-context';
+import { useNotes } from '../context/notes-context';
 
 export default function NotesScreen() {
   const { notes, loading } = useNotes();
@@ -9,7 +9,7 @@ export default function NotesScreen() {
     <TouchableOpacity
       style={styles.item}
       onPress={() => router.push({
-        pathname: '/notes/[id]' as any,
+        pathname: 'notes/[id]' as any,
         params: { id: item.id }
       })}
     >
@@ -36,7 +36,7 @@ export default function NotesScreen() {
         keyExtractor={(item) => item.id}
       />
       <TouchableOpacity style={styles.addButton} onPress={() => router.push('/add-note' as any)}>
-        <Text style={styles.addButtonText}>Add Note</Text>
+        <Text style={styles.addButtonText}>+ Add Note</Text>
       </TouchableOpacity>
     </View>
   );

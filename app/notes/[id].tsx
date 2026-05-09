@@ -1,11 +1,11 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useNotes } from '../context/notes-context';
 
 export default function NoteDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { notes, updateNote } = useNotes();
+  const { notes, updateNote, deleteNote } = useNotes();
   const note = notes.find(n => n.id === id);
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState('');
@@ -47,6 +47,29 @@ export default function NoteDetailScreen() {
     }
   };
 
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Note',
+      'Are you sure you want to delete this note?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const success = await deleteNote(note.id);
+            if (success) {
+              Alert.alert('Deleted', 'Note deleted successfully.');
+              router.back();
+            } else {
+              Alert.alert('Error', 'Unable to delete note.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       {isEditing ? (
@@ -78,6 +101,9 @@ export default function NoteDetailScreen() {
           <Text style={styles.id}>ID: {note.id}</Text>
           <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
             <Text style={styles.editButtonText}>Edit Note</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+            <Text style={styles.deleteButtonText}>Delete Note</Text>
           </TouchableOpacity>
         </>
       )}
@@ -133,6 +159,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   editButtonText: {
+    color: 'white',
+    fontSize: 18,
+  },
+  deleteButton: {
+    backgroundColor: '#FF3B30',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  deleteButtonText: {
     color: 'white',
     fontSize: 18,
   },

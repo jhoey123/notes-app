@@ -1,5 +1,5 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { addNote as addNoteToDb, getNotes, initDatabase, updateNote as updateNoteToDb } from './database';
+import { addNote as addNoteToDb, deleteNote as deleteNoteToDb, getNotes, initDatabase, updateNote as updateNoteToDb } from './database';
 
 export interface Note {
   id: string;
@@ -11,6 +11,7 @@ interface NotesContextType {
   notes: Note[];
   addNote: (title: string, category: string) => Promise<void>;
   updateNote: (id: string, title: string, category: string) => Promise<boolean>;
+  deleteNote: (id: string) => Promise<boolean>;
   loading: boolean;
 }
 
@@ -68,8 +69,21 @@ export const NotesProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
+  const deleteNote = async (id: string) => {
+    try {
+      const success = await deleteNoteToDb(id);
+      if (success) {
+        setNotes(prev => prev.filter(note => note.id !== id));
+      }
+      return success;
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      return false;
+    }
+  };
+
   return (
-    <NotesContext.Provider value={{ notes, addNote, updateNote, loading }}>
+    <NotesContext.Provider value={{ notes, addNote, updateNote, deleteNote, loading }}>
       {children}
     </NotesContext.Provider>
   );
